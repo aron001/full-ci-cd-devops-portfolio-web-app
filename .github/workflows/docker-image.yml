@@ -21,18 +21,28 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Push Docker image to Docker Hub
         run: docker push aron918/my-portifello-ci-cd-git-workflow:${{ github.sha }}
+ 
+  update-manifest:
+    runs-on: ubuntu-latest
 
-  # deploy:
-  #   needs: build
-  #   runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Checkout manifest repository
+        uses: actions/checkout@v2
+        with:
+          repository: aron001/full-ci-cd-devops-portfolio-web-app-deployment-manifest.git
+          ref: main
 
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v3
-  #     - name: Update Kubernetes deployment manifest
-  #       run: |
-  #         sed -i 's|old-image-name:old-tag|my-image-name:$(date +%s)|' deployment.yaml
-  #         git config --global user.name "GitHub Actions"
-  #         git config --global user.email "<>"
-  #         git commit -am "Update Docker image"
-  #         git push origin main
+      - name: Configure Git
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+
+      - name: Update manifest
+        run: |
+          cd full-ci-cd-devops-portfolio-web-app-deployment-manifest
+          sed -i "s#image:.*#image: aron918/my-portifello-ci-cd-git-workflow:${{ github.sha }}#g" ./frontend-deploy.yaml
+          git add ./frontend-deploy.yaml
+          git commit -m "Update the frontend image tag [skip ci]"
+          git remote add origin_with_token https://aron001:${{ secrets.PAT }}@github.com/aron001/full-ci-cd-devops-portfolio-web-app-deployment-manifest.git
+          git push origin_with_token HEAD:main
