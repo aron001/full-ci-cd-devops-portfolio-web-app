@@ -23,6 +23,7 @@ jobs:
         run: docker push aron918/my-portifello-ci-cd-git-workflow:${{ github.sha }}
  
   update-manifest:
+    needs: build
     runs-on: ubuntu-latest
 
     steps:
@@ -40,7 +41,6 @@ jobs:
 
       - name: Update manifest
         run: |
-          cd full-ci-cd-devops-portfolio-web-app-deployment-manifest
           sed -i "s#image:.*#image: aron918/my-portifello-ci-cd-git-workflow:${{ github.sha }}#g" ./frontend-deploy.yaml
           git add ./frontend-deploy.yaml
           git commit -m "Update the frontend image tag [skip ci]"
