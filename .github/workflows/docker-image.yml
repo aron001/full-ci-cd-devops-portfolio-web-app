@@ -46,4 +46,4 @@ jobs:
           git commit -m "Update the frontend image tag [skip ci]"
           git remote add origin_with_token https://aron001:${{ secrets.PAT }}@github.com/aron001/full-ci-cd-devops-portfolio-web-app-deployment-manifest.git
           git push origin_with_token HEAD:main
-# comment added
+# comment added again
